@@ -15,20 +15,6 @@ import org.rascalmpl.interpreter.result.ResultFactory;
 import org.rascalmpl.interpreter.types.FunctionType;
 import org.rascalmpl.interpreter.types.RascalTypeFactory;
 import org.rascalmpl.interpreter.utils.RuntimeExceptionFactory;
-import org.rascalmpl.value.IAnnotatable;
-import org.rascalmpl.value.IBool;
-import org.rascalmpl.value.IConstructor;
-import org.rascalmpl.value.IInteger;
-import org.rascalmpl.value.IReal;
-import org.rascalmpl.value.IString;
-import org.rascalmpl.value.IValue;
-import org.rascalmpl.value.IValueFactory;
-import org.rascalmpl.value.IWithKeywordParameters;
-import org.rascalmpl.value.impl.AbstractExternalValue;
-import org.rascalmpl.value.type.Type;
-import org.rascalmpl.value.type.TypeFactory;
-import org.rascalmpl.value.visitors.IValueVisitor;
-import org.rascalmpl.value.visitors.VisitorAdapter;
 
 import funcons.carriers.IEval;
 import funcons.entities.Forwards;
@@ -38,6 +24,19 @@ import funcons.values.Bool;
 import funcons.values.Int;
 import funcons.values.properties.Value;
 import funcons.values.signals.FunconException;
+import io.usethesource.vallang.IAnnotatable;
+import io.usethesource.vallang.IBool;
+import io.usethesource.vallang.IConstructor;
+import io.usethesource.vallang.IInteger;
+import io.usethesource.vallang.IReal;
+import io.usethesource.vallang.IString;
+import io.usethesource.vallang.IValue;
+import io.usethesource.vallang.IValueFactory;
+import io.usethesource.vallang.IWithKeywordParameters;
+import io.usethesource.vallang.type.Type;
+import io.usethesource.vallang.type.TypeFactory;
+import io.usethesource.vallang.visitors.IValueVisitor;
+import io.usethesource.vallang.visitors.VisitorAdapter;
 
 public class ToEval {
 
