@@ -1,0 +1,61 @@
+* Aliases of constructors in patterns
+
+== efficiency
+  * left-factoring of funcon modules?
+
+== cbs2iml
+FEATURES OF CBS-beta NOT SUPPORTED
+  * bi-directional control entities (pattern to term)
+  * input entities
+  * type-patterns in datatype-declaration (pattern to term/annotation)
+
+== lexing
+
+* ambiguity example _:=>
+* comments
+* section titles 
+
+== parsing
+
+* comments before funcon specs
+* satisfy =/= return?
+* finding sources of ambiguities is a pain
+
+== simplification
+* when using standard-out in conclusion, why is it necessary to use in the premises?
+
+== old
+Targets:
+> pretty-printing string literals, should escape newline characters? 
+> no premise, with output:
+    * print
+
+Problematic:
+> sequences in patterns (order of difficulty):
+    * left-to-right 
+        why wont the following work?: 
+            /*
+              `left-to-right(X1,...,Xn)` executes `X1`,...,`Xn` from left to right,
+              computing a tuple of result values `(V1,...,VN)`.
+            */
+            Funcon
+              left-to-right(_:(=>values)*) : =>(values*)
+            Rule
+              left-to-right(V:values) = V
+            Rule
+                                   Y ---> Y'
+              -----------------------------------------------------------
+              left-to-right(V*:values*,Y,Z*) ---> left-to-right(V*,Y',Z*)
+ 
+CBS syntax:
+    * possible to write a rule without using the funcon name, e.g.
+        node(T1,T2) = ... (for funcon flatten)
+
+CBS specification:
+    * else, left-to-right: Otherwise contains rewrite (following steps) 
+    * nth, argument Tup does not contain +
+    * should failed be defined like so: failed(_:signals?) (wildcard)
+    * definition of tuple type has no sort.
+    * follow-if-link contains "links", although this type should have a param
+        similar for link-stores.cbs
+    * variant without param name

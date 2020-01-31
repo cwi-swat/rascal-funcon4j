@@ -1,0 +1,9 @@
+
+* Lifting phase: adding lifted Funcons to AST, one for every operation
+* Congruence phase: add congruence rules for every funcon, depending on signature
+* Name of Funcon not in FunconPattern, assumed to be the same as the parent Funcons 
+        (check statically at construction time)
+* Write-only entities can not be updated by conditional rules (condition of refocussing)
+
+* Is it possible to check whether rules form closure? (always one applies)
+

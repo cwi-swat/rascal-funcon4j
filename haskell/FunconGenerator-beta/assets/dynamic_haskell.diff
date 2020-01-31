@@ -1,0 +1,152 @@
+Index: src/Main.hs
+===================================================================
+--- src/Main.hs	(revision 14057)
++++ src/Main.hs	(working copy)
+@@ -7,7 +7,8 @@
+ import Simplify.CoreToTarget (core2target)
+ import Simplify.LiftStrictness (lift_strictness)
+ import Simplify.TargetToFunconModules (target2fmodule)
+-import Print.HaskellModule (cbs2module)
++import qualified Print.HaskellModule as HS 
++import qualified Print.HaskellDynamic as HSD
+ --import Print.JavaClasses (cbs2classes)
+ --import Print.Ascii (cbs2ascii)
+ import Types.FunconModule (FunconModule)
+@@ -59,7 +60,8 @@
+ cbs2 :: [String] -> FilePath -> Maybe FilePath -> Maybe String -> 
+           Component FunconModule (Maybe (IO ()))
+ cbs2 options  {-| "--java" `elem` options   = cbs2classes
+-              | "--ascii" `elem` options  = cbs2ascii
+-              | otherwise -}                = cbs2module
++              | "--ascii" `elem` options  = cbs2ascii-}
++              | "--dynamic-haskell" `elem` options = HSD.cbs2module
++              | otherwise                   = HS.cbs2module
+ 
+ 
+Index: src/Print/HaskellDynamic.hs
+===================================================================
+--- src/Print/HaskellDynamic.hs	(revision 14057)
++++ src/Print/HaskellDynamic.hs	(working copy)
+@@ -1,9 +1,9 @@
+ {-# LANGUAGE LambdaCase #-}
+ -- many opportunities for small optimisations
+ -- e.g. do not apply (map text), gList, nameOfSig, stepTypeOfSig, etc. multiple times
+-module Print.HaskellModule where
++module Print.HaskellDynamic where
+ 
+-import Funcons.EDSL (Funcons(..),DataTypeMembers(..))
++import Funcons.EDSL (Funcons(..),DataTypeMembers(..), DataTypeAltt(..))
+ 
+ import Print.Util
+ import Types.ConcreteSyntax (showConcreteTerm)
+@@ -18,7 +18,6 @@
+ import Prelude hiding ((<$>))
+ 
+ import Control.Monad (unless)
+-import Data.Maybe (catMaybes)
+ import Data.List(intercalate, findIndices)
+ import Data.List.Split (splitOn)
+ import Data.Char (toUpper, isUpper, toLower)
+@@ -79,10 +78,15 @@
+ main_string = "main = mkMainWithLibraryEntitiesTypes funcons entities types"
+ 
+ gHeader :: Maybe String -> Doc
+-gHeader mmodname = vsep $
+-  [text "{-# LANGUAGE" <+> text "OverloadedStrings" <+> text "#-}"] ++
++gHeader mmodname = vcat $
++  [text "{-# LANGUAGE" <+> text "OverloadedStrings" <+> text "#-}"
++  ,text "{-# LANGUAGE" <+> text "GADTs" <+> text "#-}"
++  ,text "{-# LANGUAGE" <+> text "ScopedTypeVariables" <+> text "#-}"
++  ,text "{-# LANGUAGE" <+> text "ExistentialQuantification" <+> text "#-}"
++  ,text ""] ++
+   (maybe [] (\nm -> [text "module" <+> text nm <+> text "where"]) mmodname) ++
+-  [text "import" <+> text "Funcons.EDSL"] ++ 
++  [text"", text "import" <+> text "Funcons.Reflection.Types"
++  ,text "import" <+> text "Funcons.Reflection.TypesBuiltin"] ++ 
+   (maybe [text "import" <+> text "Funcons.Tools", text main_string] (const []) mmodname)
+    
+ gFile :: AliasMap -> [FunconSpec] -> [EntitySpec] -> [DataTypeMembers] -> Maybe Doc
+@@ -90,19 +94,10 @@
+     | null fspecs && null especs && null dspecs = Nothing
+     | otherwise = Just $
+     vsep $
+-        [text fEntities <=> gList [] -- {- defaults have been removed from beta -} 
+-        ,text fTypes <=> text ftypeEnvFromList $+$
+-            nest 4 (gList (concatMap (gTypes als) dspecs))
+-        ,text fFuncons <=> text fLibFromList $+$
+-            nest 4 (gList lib_entries)]
+-        ++ map (gStep als) fspecs
++        [text ""]
++        ++ concatMap (gType als) dspecs
+ --        ++ concatMap (\(DataTypeDecl _ _ alts) -> map gCons alts) dspecs
+-        ++ map gData dspecs
+-    where   lib_entries =   concatMap (gLibF als) fspecs 
+-                        ++  concatMap (gLibD als) dspecs 
+---                        ++  concatMap (gLibC als) dspecs
+-
+-            gLibF :: AliasMap -> FunconSpec -> [Doc]
++    where   gLibF :: AliasMap -> FunconSpec -> [Doc]
+             gLibF als (F.FunconSpec name sig _ _ _) = 
+               [ gTuple [gString alias
+                        ,gStepType steptype <+> text (stepName name)]
+@@ -322,8 +317,31 @@
+ 
+          sig_var sigNm = text ("__var" ++ var2id sigNm)
+ 
++gType :: AliasMap -> DataTypeMembers -> [Doc]
++gType als (DataTypeMemberss _ _ []) = []
++gType als m = gTypeVals m : gTypeEval als m {-++ gTypeConss als m -}
++
++gTypeVals (DataTypeMemberss nm params alts) = 
++  text "data" <+> text (hscid (unpack nm)) <=> dataAlts (concatMap gAlt alts)
++  where dataAlts :: [Doc] -> Doc
++        dataAlts [] = empty 
++        dataAlts [h] = h
++        dataAlts (h:hs) = vcat (h : map (\d -> text "|" <+> d) hs)
++
++        gAlt (DataTypeInclusionn _) = []
++        gAlt (DataTypeMemberConstructor cnm args mparams) = 
++          [text "forall" <+> hsep tyvars <.> constraints <+> text "=>" <+>
++            text (hscid (unpack cnm)) <+> hsep tyvars ]
++          where tyvars = map (text . ("a"++) . show) [1..length args]
++                constraints = gTuple (map (text "Typeable" <+>) tyvars)
++ 
++gTypeEval als (DataTypeMembers nm params alts) = main : aliases
++  where main = smart_cons_name nm <=> empty
++        aliases = vcat $ [ smart_cons_name alias <=> smart_cons_name nm 
++                         | alias <- my_aliases nm als, alias /= nm ]
++
+ gTypes :: AliasMap -> DataTypeMembers -> [Doc]
+-gTypes alt (DataTypeMemberss nm' params []) = []
++gTypes als (DataTypeMemberss nm' params []) = []
+ gTypes als (DataTypeMemberss nm' params alts) =
+     [ gTuple [gString alias, gType (DataTypeMemberss (pack alias) params alts)]
+     | alias <- my_aliases nm als ]
+@@ -485,6 +503,13 @@
+ var2id (c:cs) | isUpper c = toLower c : var2id cs
+               | otherwise = c : var2id cs
+ 
++hscid :: Name -> Name
++hscid [] = []
++hscid (h:xs) = toUpper h : hscid' xs
++  where hscid' [] = [] 
++        hscid' ('-':cs) = hscid cs
++        hscid' (c:cs) = c : hscid' cs
++
+ generateArgs :: Int -> [MetaVar]
+ generateArgs max = foldr op [] [1..max]
+  where  op idx terms = ("arg" ++ show idx):terms
+Index: src/Simplify/Simplifier.hs
+===================================================================
+--- src/Simplify/Simplifier.hs	(revision 14079)
++++ src/Simplify/Simplifier.hs	(working copy)
+@@ -115,8 +115,7 @@
+               DataType -> C.DataTypeCons
+               Type     -> C.TypeCons (simplifyFSig sig)
+             sortInPattern (_, Nothing) = throwError ("constructor " ++ (sigName sig) ++ " without typed arguments")
+-            sortInPattern (_, Just sort) = simplifyFTerm sort
+- 
++            sortInPattern (_, Just sort) = simplifyFTerm sort 
+ simplifyCBSSpec _ _ (FunconSpec spec) = return . C.FunconSpec   <$> simplifyFunconSpec spec
+ simplifyCBSSpec _ _ (EntitySpec spec)      = return . C.EntitySpec   <$> simplifyEntitySpec spec
+ simplifyCBSSpec _ _ (MetaSpec spec)        = return . return $ C.MetaSpec spec 

@@ -1,0 +1,129 @@
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Normal/Sequencing/sequential.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Normal/Sequencing/left-to-right.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Normal/Sequencing/atomic.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Normal/Iterating/Definite/Mapping collections/tuple-map.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Normal/Iterating/Definite/Mapping collections/set-map.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Normal/Iterating/Definite/Mapping collections/lists-map.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Normal/Iterating/Definite/Mapping collections/list-map.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Normal/Iterating/Definite/Mapping collections/vector-map.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Normal/Iterating/Definite/Mapping collections/map-map.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Normal/Iterating/Definite/Filtering collections/set-filter.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Normal/Iterating/Definite/Filtering collections/multiset-filter.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Normal/Iterating/Definite/Filtering collections/map-filter.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Normal/Iterating/Definite/Filtering collections/list-filter.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Normal/Iterating/Definite/Reducing collections/list-foldr.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Normal/Iterating/Definite/Reducing collections/list-foldl.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Normal/Iterating/Indefinite/while.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Normal/Iterating/Indefinite/do-while.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Normal/Choosing/if-then-else.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/stuck.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/Throwing/throw.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/Throwing/thrown.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/Throwing/handle-recursively.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/Throwing/finally.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/Throwing/handle-thrown.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/Continuations/prompt.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/Continuations/shift.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/Continuations/control-signal.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/Continuations/call-cc.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/Continuations/hole.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/Continuations/abort.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/Continuations/reset.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/Continuations/control.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/Continuations/plug.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/Continuations/resume-signal.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/Failing/else.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/Failing/fail.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/Failing/signals.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/Failing/dereference.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/Failing/failed.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Control flow/Abnormal/Failing/check-true.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Interacting/standard-in.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Interacting/print.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Interacting/print-list.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Interacting/read.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Interacting/standard-out.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/effect.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Storing/store.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Storing/stores.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Storing/General variables/allocate-map.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Storing/General variables/allocate-vector.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Storing/Simple variables/assigned.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Storing/Simple variables/assign.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Storing/Simple variables/allocate-variable.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Storing/Simple variables/deallocate-variable.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Storing/Simple variables/allocate-initialised-variable.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Storing/Simple variables/current-value.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Storing/variables.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Linking/allocate-link.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Linking/allocate-initialised-link.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Linking/link-store.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Linking/follow-link.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Linking/links.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Linking/link-stores.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Linking/follow-if-link.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Giving/given.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Giving/give.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Giving/given-value.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Generating/atom-generator.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Generating/fresh-binder.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Generating/fresh-atom.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Binding/Recursion/recursive.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Binding/Recursion/bound-recursively.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Binding/Recursion/bind-recursively.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Binding/scope.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Binding/accumulate.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Binding/bound.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Binding/environments.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Binding/environment.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Binding/bind.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/sorts.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/values.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/types.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/Primitive values/atoms.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/Primitive values/Numbers/ieee-floats.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/Primitive values/Numbers/integers.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/Primitive values/Numbers/rationals.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/Primitive values/bits.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/Primitive values/booleans.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/Primitive values/unit-type.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/Primitive values/strings.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/Primitive values/empty-type.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/Primitive values/unicode-characters.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/Composite values/Collections/maps.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/Composite values/Collections/tuples.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/Composite values/Collections/multisets.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/Composite values/Collections/sets.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/Composite values/Collections/vectors.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/Composite values/Collections/directed-graphs.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/Composite values/Collections/lists.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/Composite values/Algebraic datatype values/algebraic-datatypes.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/Composite values/Algebraic datatype values/records.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/Composite values/Algebraic datatype values/references.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Values/Composite values/Algebraic datatype values/variants.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/force.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/Closures/closure.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/Closures/close.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/thunks.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/thunk.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/Patterns/pattern-bind.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/Patterns/pattern-prefer.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/Patterns/pattern-any.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/Patterns/pattern-unite.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/Patterns/patterns.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/Patterns/case.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/Functions/supply.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/Functions/lambda.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/Functions/binding-lambda.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/Functions/uncurry.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/Functions/compose.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/Functions/partial-apply.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/Functions/apply.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/Functions/curry.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Linking/set-link.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Storing/General variables/general-assigned.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Computations/Data flow/Storing/General variables/general-assign.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/is-ground-value.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/Patterns/match.cbs
+../../CBS/FCT-Editor/cbs/Funcons/Abstractions/Patterns/match-loosely.cbs
+
