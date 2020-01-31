@@ -8,10 +8,12 @@ import Simplify.CoreToTarget (core2target)
 import Simplify.LiftStrictness (lift_strictness)
 import Simplify.TargetToFunconModules (target2fmodule)
 import Print.RascalData (cbs2rascal_data)
+import Print.ObjectAlgebras (cbs2algebra_signatures)
 import Types.FunconModule (FunconModule)
 
 import CCO.Component (Component, ioRun)
 
+import Control.Arrow ((&&&))
 import Control.Monad (when)
 import Data.List (isPrefixOf)
 import Control.Arrow ((>>>))
@@ -40,15 +42,11 @@ run cbsfile srcdir lang options = do
     target <- ioRun (lexer >>> parser >>> cs2as pholder >>> simplifier 
                        >>> core2target')  cbs_contents
     fmodule <- ioRun (target2fmodule pholder) target
-    m_contents <- ioRun (cbs2 options cbsfile srcdir) fmodule
-    case m_contents of
-        Nothing -> putStrLn "No funcons, types or entities to generate"
-        Just make_contents -> make_contents
+    (rs, sigs) <- ioRun (cbs2 options cbsfile srcdir) fmodule
+    rs >> sigs 
  where pholder = any (== "--generate-unspecified-funcons") options
    
-cbs2 :: [String] -> FilePath -> FilePath -> CCO.Component.Component FunconModule (Maybe (IO ()))
-cbs2 options  {-| "--java" `elem` options   = cbs2classes
-              | "--ascii" `elem` options  = cbs2ascii
-              | otherwise -}                = cbs2rascal_data
+cbs2 :: [String] -> FilePath -> FilePath -> CCO.Component.Component FunconModule (IO (), IO ())
+cbs2 options cbsd srcd = cbs2rascal_data cbsd srcd &&& cbs2algebra_signatures cbsd srcd
 
 

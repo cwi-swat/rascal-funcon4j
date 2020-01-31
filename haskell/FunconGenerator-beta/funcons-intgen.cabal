@@ -22,6 +22,7 @@ executable cbsc
                         Print.HaskellModule,
                         Print.Util,
                         Print.RascalData,
+                        Print.ObjectAlgebras,
                         Simplify.ConcreteToAbstract
                         Simplify.Simplifier,
                         Simplify.CoreToTarget,

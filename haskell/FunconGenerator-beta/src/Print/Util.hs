@@ -9,13 +9,19 @@ import Types.CoreAbstractSyntax
 
 import Data.List (intersperse, intercalate)
 import Data.List.Split
-import Data.Char (toUpper)
+import Data.Char (toUpper, isUpper, toLower)
 import Data.Text (Text, unpack)
 import Text.PrettyPrint.HughesPJ
 
 import Funcons.EDSL (Funcons(..))
 
 import System.FilePath (splitDirectories, dropFileName, dropExtension, takeBaseName)
+
+var2id :: String -> String
+var2id [] = []
+var2id ('-':cs) = '_' : var2id cs
+var2id (c:cs) | isUpper c = toLower c : var2id cs
+              | otherwise = c : var2id cs
 
 
 text' :: Text -> Doc

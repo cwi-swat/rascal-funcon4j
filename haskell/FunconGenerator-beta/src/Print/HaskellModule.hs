@@ -21,7 +21,7 @@ import Control.Monad (unless)
 import Data.Maybe (catMaybes)
 import Data.List(intercalate, findIndices)
 import Data.List.Split (splitOn)
-import Data.Char (toUpper, isUpper, toLower)
+import Data.Char (toUpper)
 import Text.PrettyPrint.HughesPJ
 import Data.Text(pack,unpack)
 
@@ -444,11 +444,6 @@ needsCongruence C.Strict = True
 
 hsid :: Name -> Doc
 hsid = text . var2id
-
-var2id [] = []
-var2id ('-':cs) = '_' : var2id cs
-var2id (c:cs) | isUpper c = toLower c : var2id cs
-              | otherwise = c : var2id cs
 
 generateArgs :: Int -> [MetaVar]
 generateArgs max = foldr op [] [1..max]
