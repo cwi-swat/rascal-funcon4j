@@ -8,7 +8,7 @@ import Simplify.CoreToTarget (core2target)
 import Simplify.LiftStrictness (lift_strictness)
 import Simplify.TargetToFunconModules (target2fmodule)
 import Print.RascalData (cbs2rascal_data)
-import Print.ObjectAlgebras (cbs2algebra_signatures)
+import Print.ObjectAlgebras (cbs2algebra_signatures, cbs2algebra_printers)
 import Types.FunconModule (FunconModule)
 
 import CCO.Component (Component, ioRun)
@@ -42,11 +42,13 @@ run cbsfile srcdir lang options = do
     target <- ioRun (lexer >>> parser >>> cs2as pholder >>> simplifier 
                        >>> core2target')  cbs_contents
     fmodule <- ioRun (target2fmodule pholder) target
-    (rs, sigs) <- ioRun (cbs2 options cbsfile srcdir) fmodule
-    rs >> sigs 
+    (rs, (sigs, pps)) <- ioRun (cbs2 options cbsfile srcdir) fmodule
+    rs >> sigs >> pps
  where pholder = any (== "--generate-unspecified-funcons") options
    
-cbs2 :: [String] -> FilePath -> FilePath -> CCO.Component.Component FunconModule (IO (), IO ())
-cbs2 options cbsd srcd = cbs2rascal_data cbsd srcd &&& cbs2algebra_signatures cbsd srcd
+cbs2 :: [String] -> FilePath -> FilePath -> CCO.Component.Component FunconModule (IO (), (IO (), IO ()))
+cbs2 options cbsd srcd =  cbs2rascal_data cbsd srcd &&& 
+                          cbs2algebra_signatures cbsd srcd &&&
+                          cbs2algebra_printers cbsd srcd
 
 
