@@ -64,10 +64,11 @@ cbs2algebra_printers cbsfile srcdir = component (\cbsfile -> return $ do
 gFactory :: FunconModule -> String -> String -> Doc
 gFactory fm orig_modname modname = 
   text "package funcons.prettyprinter;\n" $+$
-  text ("import funcons.algebras.") <> text orig_modname <> text "Arg" <> semi $+$
+  text ("import funcons.algebras.") <> text orig_modname <> text "Alg" <> semi $+$
   text ("import funcons.carriers.") <> text "IPrint" <> semi $+$
   text ("import funcons.values.String") <> semi $+$
-  text "public" <+> text "interface" <+> text modname <> gAngle [text "E"] <+> lbrace $+$
+  text "public" <+> text "interface" <+> text modname <+> 
+   text "extends" <+> text (orig_modname ++ "Alg") <> gAngle [text "IPrint"] <+> lbrace $+$
     nest 2 (
       vsep (concatMap (gFCT (aliases fm)) (funcons fm))
     ) $+$
