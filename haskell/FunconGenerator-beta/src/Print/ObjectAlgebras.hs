@@ -44,9 +44,11 @@ gSignature :: AliasMap -> FunconSpec -> [Doc]
 gSignature amap (F.FunconSpec name sig _ _ _) = concatMap (for_name sig) (my_aliases name amap)
   where for_name sig name = case sig of 
           FPartiallyLazy ss Nothing  -> [fixed (length ss), variadic]
+          FNullary                   -> [nullary]
           _                          -> [variadic]
-          where variadic = text "E" <+> text (var2id name) <> parens (text "E" <> brackets empty <+> text "args") <> semi
-                fixed n =  text "E" <+> text (var2id name) <> gTuple (zipWith (\t n -> t <+> text ("arg" ++ show n)) (repeat (text "E")) [1..n]) <> semi
+          where variadic = text "E" <+> text (var2id name ++ "_") <> parens (text "E" <> brackets empty <+> text "args") <> semi
+                nullary = text "E" <+> text (var2id name ++ "_") <> parens empty
+                fixed n =  text "E" <+> text (var2id name ++ "_") <> gTuple (zipWith (\t n -> t <+> text ("arg" ++ show n)) (repeat (text "E")) [1..n]) <> semi
 
 
 cbs2algebra_printers :: FilePath -> FilePath -> Component FunconModule (IO ())
@@ -66,7 +68,7 @@ gFactory fm orig_modname modname =
   text "package funcons.prettyprinter;\n" $+$
   text ("import funcons.algebras.") <> text orig_modname <> text "Alg" <> semi $+$
   text ("import funcons.carriers.") <> text "IPrint" <> semi $+$
-  text ("import funcons.values.String") <> semi $+$
+  text ("import java.util.Arrays") <> semi $+$
   text "public" <+> text "interface" <+> text modname <+> 
    text "extends" <+> text (orig_modname ++ "Alg") <> gAngle [text "IPrint"] <+> lbrace $+$
     nest 2 (
@@ -79,17 +81,21 @@ gFCT amap (F.FunconSpec name sig _ _ _) = concatMap (for_name sig) (my_aliases n
   where for_name sig name = case sig of 
           FPartiallyLazy ss Nothing  -> [common (fixed (length ss)) name (Just $ length ss)
                                         ,common variadic name Nothing]
+          FNullary                   -> [common nullary name (Just 0)]
           _                          -> [common variadic name Nothing]
           where common b n mnr = 
                   text "@Override" $+$
-                  text "default" <+> text "IPrint" <+> text (var2id n) <> params <+> lbrace $+$
+                  text "default" <+> text "IPrint" <+> text (var2id n ++ "_") <> params <+> lbrace $+$
                     nest 2 b $+$ 
                   rbrace
-                  where params | Just nr <- mnr = gTuple (zipWith (\t n -> t <+> text ("arg" ++ show n)) (repeat (text "IPrint")) [1..nr])
+                  where params | Just 0 <- mnr = parens empty
+                               | Just nr <- mnr = gTuple (zipWith (\t n -> t <+> text ("arg" ++ show n)) (repeat (text "IPrint")) [1..nr])
                                | otherwise = parens (text "IPrint" <> brackets empty <+> text "args")
                 functional d = text "return" <+> parens empty <+> text "->" <+> text "new" <+> text "String" <> parens d <> semi
-                variadic = functional $ doubleQuotes (text (var2id name) <> parens empty)
-                fixed n =  functional $ doubleQuotes (text (var2id name) <> lparen) <> text " + " <> (
-                              hcat (intersperse (text " + \", \" + ") (map (\i -> text ("arg" ++ show i) <.> text "toFCT" <> parens empty <.> text "stringValue()") [1..n])) <> text " + " <> doubleQuotes rparen
+                variadic = functional $ doubleQuotes (text name <> lparen) <+> text "+" <+> stream <+> text "+" <+> doubleQuotes rparen 
+                 where stream = text "Arrays.stream(args).map(a -> a.toFCT()).reduce(\"\",(a1,a2) -> a1 + \", \" + a2)"
+                fixed n =  functional $ doubleQuotes (text name <> lparen) <> text " + " <> (
+                              hcat (intersperse (text " + \", \" + ") (map (\i -> text ("arg" ++ show i) <.> text "toFCT" <> parens empty) [1..n])) <> text " + " <> doubleQuotes rparen
                             ) 
+                nullary = functional $ doubleQuotes (text name)
 

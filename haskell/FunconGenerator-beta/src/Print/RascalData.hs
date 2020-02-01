@@ -34,17 +34,23 @@ cbs2rascal_data cbsfile srcdir = component (\cbsfile -> return $ do
 gDoc :: FunconModule -> String -> Doc
 gDoc fm modname = 
   text main_contents $+$ 
-  text "data" <+> text "FunCon" $+$ 
-  nest 2 (
-    equals <+> vcat (intersperse (text "|") (concatMap (gFuncon (aliases fm)) (funcons fm)) ++ [semi])
+  if (null (funcons fm)) then empty else 
+    text "data" <+> text "FunCon" $+$ 
+    nest 2 (vcat $
+      (equals <+> head cons_docs <> text ""):
+      map (\d -> text "|" <+> d <> text "") (tail cons_docs) ++ 
+      [semi]
     )
-  where  main_contents = "module lang::funcon::" ++ modname ++ "\n"
+  where cons_docs = concatMap (gFuncon (aliases fm)) (funcons fm)
+        main_contents = "module lang::funcon::" ++ modname ++ "\n"
 
 gFuncon :: AliasMap -> FunconSpec -> [Doc]
 gFuncon amap (F.FunconSpec name sig _ _ _) = concatMap (for_name sig) (my_aliases name amap)
   where for_name sig name = case sig of 
           FPartiallyLazy ss Nothing  -> [fixed (length ss), variadic]
+          FNullary                   -> [nullary]
           _                          -> [variadic]
-          where variadic = text (var2id name) <> parens (text "list" <> gList [text "FunCon"] <+> text "args")
-                fixed n =  text (var2id name) <> gTuple (zipWith (\t n -> t <+> text ("arg" ++ show n)) (repeat (text "Funcon")) [1..n])
+          where variadic = text (var2id name ++ "_") <> parens (text "list" <> gList [text "FunCon"] <+> text "args")
+                nullary = text (var2id name ++ "_") <> parens empty
+                fixed n =  text (var2id name ++ "_") <> gTuple (zipWith (\t n -> t <+> text ("arg" ++ show n)) (repeat (text "FunCon")) [1..n])
 
