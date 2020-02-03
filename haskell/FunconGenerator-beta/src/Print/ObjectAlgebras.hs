@@ -47,7 +47,7 @@ gSignature amap (F.FunconSpec name sig _ _ _) = concatMap (for_name sig) (my_ali
           FNullary                   -> [nullary]
           _                          -> [variadic]
           where variadic = text "E" <+> text (var2id name ++ "_") <> parens (text "E" <> brackets empty <+> text "args") <> semi
-                nullary = text "E" <+> text (var2id name ++ "_") <> parens empty
+                nullary = text "E" <+> text (var2id name ++ "_") <> parens empty <> semi
                 fixed n =  text "E" <+> text (var2id name ++ "_") <> gTuple (zipWith (\t n -> t <+> text ("arg" ++ show n)) (repeat (text "E")) [1..n]) <> semi
 
 
