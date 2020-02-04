@@ -68,7 +68,7 @@ gFactory fm orig_modname modname =
   text "package funcons.prettyprinter;\n" $+$
   text ("import funcons.algebras.") <> text orig_modname <> text "Alg" <> semi $+$
   text ("import funcons.carriers.") <> text "IPrint" <> semi $+$
-  text ("import java.util.Arrays") <> semi $+$
+  text ("import funcons.prettyprinter.FCTPrinter") <> semi $+$
   text "public" <+> text "interface" <+> text modname <+> 
    text "extends" <+> text (orig_modname ++ "Alg") <> gAngle [text "IPrint"] <+> lbrace $+$
     nest 2 (
@@ -91,11 +91,9 @@ gFCT amap (F.FunconSpec name sig _ _ _) = concatMap (for_name sig) (my_aliases n
                   where params | Just 0 <- mnr = parens empty
                                | Just nr <- mnr = gTuple (zipWith (\t n -> t <+> text ("arg" ++ show n)) (repeat (text "IPrint")) [1..nr])
                                | otherwise = parens (text "IPrint" <> brackets empty <+> text "args")
-                functional d = text "return" <+> parens empty <+> text "->" <+> text "new" <+> text "String" <> parens d <> semi
-                variadic = functional $ doubleQuotes (text name <> lparen) <+> text "+" <+> stream <+> text "+" <+> doubleQuotes rparen 
-                 where stream = text "Arrays.stream(args).map(a -> a.toFCT()).reduce(\"\",(a1,a2) -> a1 + \", \" + a2)"
-                fixed n =  functional $ doubleQuotes (text name <> lparen) <> text " + " <> (
-                              hcat (intersperse (text " + \", \" + ") (map (\i -> text ("arg" ++ show i) <.> text "toFCT" <> parens empty) [1..n])) <> text " + " <> doubleQuotes rparen
-                            ) 
-                nullary = functional $ doubleQuotes (text name)
+                return d = text "return" <+> text "FCTPrinter." <> d <> semi
+                variadic = return $ text "variadic" <> parens (doubleQuotes (text name) <> comma <> text "args")
+                fixed n =  return $ text "fixed" <> parens (doubleQuotes (text name) <> comma <> args)
+                  where args = hcat (intersperse (text ", ") (map (\i -> text ("arg" ++ show i)) [1..n])) 
+                nullary = return $ text "nullary" <> parens (doubleQuotes (text name)) 
 
