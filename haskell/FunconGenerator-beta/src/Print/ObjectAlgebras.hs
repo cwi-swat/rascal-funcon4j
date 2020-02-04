@@ -1,6 +1,8 @@
 
 module Print.ObjectAlgebras where
 
+import Funcons.EDSL (DataTypeMembers(..))
+
 import Types.ConcreteSyntax (showConcreteTerm)
 import Types.SourceAbstractSyntax hiding (CBSFile(..),CBSSpec(..),FunconSpec(..),FSig,FStep,FPremiseStep,FValueSorts(..),Name,FValueSort(..),EntitySpec(..),FSideCondition(..),DataTypeSpec(..),FTerm(..),DataTypeAlt(..),FValSorts(..),FPattern(..), CommentPart(..))
 import Types.CoreAbstractSyntax hiding (Lazy, Strict, CBSFile(..),CBSSPec(..),FunconSpec(..),FRewriteRule(..),FPremiseStep(..),FStep(..),FStepRule(..), DataTypeSpec(..), DataTypeAlt(..))
@@ -13,6 +15,7 @@ import Prelude hiding ((<$>),(<>))
 
 import Text.PrettyPrint.HughesPJ 
 import Data.List (intersperse)
+import Data.Text (unpack)
 
 import System.FilePath hiding ((<.>)) 
 import qualified System.FilePath as FP
@@ -36,21 +39,22 @@ gInterface fm modname =
   text "package funcons.algebras;\n" $+$ 
   text "public" <+> text "interface" <+> text modname <> gAngle [text "E"] <+> lbrace $+$
     nest 2 (
-      vsep (concatMap (gSignature (aliases fm)) (funcons fm))
+      vcat (concatMap (gSignature (aliases fm)) (funcons fm)
+         ++ concatMap (gDataSignature (aliases fm)) (datatypes fm))
     ) $+$
   rbrace
 
 gSignature :: AliasMap -> FunconSpec -> [Doc]
-gSignature amap (F.FunconSpec name sig _ _ _) = concatMap (for_name sig) (my_aliases name amap)
+gSignature amap (F.FunconSpec name sig _ _ _) = map (for_name sig) (my_aliases name amap)
   where for_name sig name = case sig of 
-          FPartiallyLazy ss Nothing  -> [fixed (length ss), variadic]
-          FNullary                   -> [nullary]
-          _                          -> [variadic]
-          where variadic = text "E" <+> text (var2id name ++ "_") <> parens (text "E" <> brackets empty <+> text "args") <> semi
-                nullary = text "E" <+> text (var2id name ++ "_") <> parens empty <> semi
-                fixed n =  text "E" <+> text (var2id name ++ "_") <> gTuple (zipWith (\t n -> t <+> text ("arg" ++ show n)) (repeat (text "E")) [1..n]) <> semi
+          FPartiallyLazy ss Nothing  -> fixed (length ss)
+          FNullary                   -> nullary_sig name
+          _                          -> variadic_sig name
+          where fixed n =  text "E" <+> text (var2id name ++ "_") <> gTuple (zipWith (\t n -> t <+> text ("arg" ++ show n)) (repeat (text "E")) [1..n]) <> semi
 
-
+variadic_sig name = text "E" <+> text (var2id name ++ "__") <> parens (text "E" <> brackets empty <+> text "args") <> semi
+nullary_sig name = text "E" <+> text (var2id name ++ "_") <> parens empty <> semi
+                
 cbs2algebra_printers :: FilePath -> FilePath -> Component FunconModule (IO ())
 cbs2algebra_printers cbsfile srcdir = component (\cbsfile -> return $ do
   createDirectoryIfMissing True file_dir 
@@ -72,28 +76,41 @@ gFactory fm orig_modname modname =
   text "public" <+> text "interface" <+> text modname <+> 
    text "extends" <+> text (orig_modname ++ "Alg") <> gAngle [text "IPrint"] <+> lbrace $+$
     nest 2 (
-      vsep (concatMap (gFCT (aliases fm)) (funcons fm))
+      vsep (concatMap (gFCT (aliases fm)) (funcons fm) 
+         ++ concatMap (gData (aliases fm)) (datatypes fm))
     ) $+$
   rbrace
 
 gFCT :: AliasMap -> FunconSpec -> [Doc]
-gFCT amap (F.FunconSpec name sig _ _ _) = concatMap (for_name sig) (my_aliases name amap)
+gFCT amap (F.FunconSpec name sig _ _ _) = map (for_name sig) (my_aliases name amap)
   where for_name sig name = case sig of 
-          FPartiallyLazy ss Nothing  -> [common (fixed (length ss)) name (Just $ length ss)
-                                        ,common variadic name Nothing]
-          FNullary                   -> [common nullary name (Just 0)]
-          _                          -> [common variadic name Nothing]
-          where common b n mnr = 
-                  text "@Override" $+$
-                  text "default" <+> text "IPrint" <+> text (var2id n ++ "_") <> params <+> lbrace $+$
-                    nest 2 b $+$ 
-                  rbrace
-                  where params | Just 0 <- mnr = parens empty
-                               | Just nr <- mnr = gTuple (zipWith (\t n -> t <+> text ("arg" ++ show n)) (repeat (text "IPrint")) [1..nr])
-                               | otherwise = parens (text "IPrint" <> brackets empty <+> text "args")
-                return d = text "return" <+> text "FCTPrinter." <> d <> semi
-                variadic = return $ text "variadic" <> parens (doubleQuotes (text name) <> comma <> text "args")
-                fixed n =  return $ text "fixed" <> parens (doubleQuotes (text name) <> comma <> args)
+          FPartiallyLazy ss Nothing  -> fixed (length ss)
+          FNullary                   -> nullary name
+          _                          -> variadic name
+          where fixed n =  common (fct_printer (text "fixed" <> parens (doubleQuotes (text name) <> comma <> args))) (var2id name ++ "_") (Just n)
                   where args = hcat (intersperse (text ", ") (map (\i -> text ("arg" ++ show i)) [1..n])) 
-                nullary = return $ text "nullary" <> parens (doubleQuotes (text name)) 
+gData :: AliasMap -> DataTypeMembers -> [Doc]
+gData amap (DataTypeMemberss name tparams _) = map for_name (my_aliases (unpack name) amap)
+  where for_name name | null tparams  = nullary name
+                      | otherwise     = variadic name
 
+gDataSignature :: AliasMap -> DataTypeMembers -> [Doc]
+gDataSignature amap (DataTypeMemberss name tparams _) = map for_name (my_aliases (unpack name) amap)
+  where for_name name | null tparams = nullary_sig name 
+                      | otherwise    = variadic_sig name
+
+nullary name = common 
+  (fct_printer (text "nullary" <> parens (doubleQuotes (text name))))
+  (var2id name ++ "_") (Just 0)
+variadic name = common 
+  (fct_printer (text "variadic" <> parens (doubleQuotes (text name) <> comma <> text "args"))) (var2id name ++ "__") Nothing
+
+common b n mnr =  
+  text "@Override" $+$
+  text "default" <+> text "IPrint" <+> text n <> params <+> lbrace $+$
+    nest 2 b $+$ 
+  rbrace
+  where params | Just 0 <- mnr = parens empty
+               | Just nr <- mnr = gTuple (zipWith (\t n -> t <+> text ("arg" ++ show n)) (repeat (text "IPrint")) [1..nr])
+               | otherwise = parens (text "IPrint" <> brackets empty <+> text "args")
+fct_printer d = text "return" <+> text "FCTPrinter." <> d <> semi

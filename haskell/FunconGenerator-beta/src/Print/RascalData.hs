@@ -1,6 +1,8 @@
 
 module Print.RascalData where
 
+import Funcons.EDSL(DataTypeMembers(..))
+
 import Types.ConcreteSyntax (showConcreteTerm)
 import Types.SourceAbstractSyntax hiding (CBSFile(..),CBSSpec(..),FunconSpec(..),FSig,FStep,FPremiseStep,FValueSorts(..),Name,FValueSort(..),EntitySpec(..),FSideCondition(..),DataTypeSpec(..),FTerm(..),DataTypeAlt(..),FValSorts(..),FPattern(..), CommentPart(..))
 import Types.CoreAbstractSyntax hiding (Lazy, Strict, CBSFile(..),CBSSPec(..),FunconSpec(..),FRewriteRule(..),FPremiseStep(..),FStep(..),FStepRule(..), DataTypeSpec(..), DataTypeAlt(..))
@@ -13,6 +15,7 @@ import Prelude hiding ((<$>),(<>))
 
 import Text.PrettyPrint.HughesPJ 
 import Data.List (intersperse)
+import Data.Text (unpack)
 
 import System.FilePath hiding ((<.>)) 
 import qualified System.FilePath as FP
@@ -40,17 +43,31 @@ gDoc fm modname =
       (equals <+> head cons_docs <> text ""):
       map (\d -> text "|" <+> d <> text "") (tail cons_docs) ++ 
       [semi]
-    )
-  where cons_docs = concatMap (gFuncon (aliases fm)) (funcons fm)
+    ) $+$
+    vcat (concatMap (maybe [] (:[]) . snd) (conss ++ ty_conss))
+  where conss = concatMap (gFuncon (aliases fm)) (funcons fm)
+        ty_conss = concatMap (gData (aliases fm)) (datatypes fm)
+        cons_docs = map fst conss ++ map fst ty_conss
         main_contents = "module lang::funcon::" ++ modname ++ "\n"
 
-gFuncon :: AliasMap -> FunconSpec -> [Doc]
-gFuncon amap (F.FunconSpec name sig _ _ _) = concatMap (for_name sig) (my_aliases name amap)
+gFuncon :: AliasMap -> FunconSpec -> [(Doc, Maybe Doc)]
+gFuncon amap (F.FunconSpec name sig _ _ _) = map (for_name sig) (my_aliases name amap)
   where for_name sig name = case sig of 
-          FPartiallyLazy ss Nothing  -> [fixed (length ss), variadic]
-          FNullary                   -> [nullary]
-          _                          -> [variadic]
-          where variadic = text (var2id name ++ "_") <> parens (text "list" <> gList [text "FunCon"] <+> text "args")
-                nullary = text (var2id name ++ "_") <> parens empty
-                fixed n =  text (var2id name ++ "_") <> gTuple (zipWith (\t n -> t <+> text ("arg" ++ show n)) (repeat (text "FunCon")) [1..n])
+          FPartiallyLazy ss Nothing  -> (fixed (length ss), Nothing)
+          FNullary                   -> (nullary name, Nothing)
+          _                          -> (variadic name, Just (variadic_smart name))
+          where fixed n =  text (var2id name ++ "_") <> gTuple (zipWith (\t n -> t <+> text ("arg" ++ show n)) (repeat (text "FunCon")) [1..n])
 
+gData :: AliasMap -> DataTypeMembers -> [(Doc, Maybe Doc)]
+gData amap (DataTypeMemberss name tyargs _) = map for_name (my_aliases (unpack name) amap)
+  where for_name name | null tyargs = (nullary name, Nothing)
+                      | otherwise   = (variadic name, Just (variadic_smart name))
+
+variadic name = 
+  text (var2id name ++ "__") <> parens (text "list" <> gList [text "FunCon"] <+> text "args")
+variadic_smart name = 
+  text "FunCon" <+> text (var2id name ++ "_") <> parens (text "FunCon" <+> text "args...") <=> 
+    text (var2id name ++ "__") <> parens (text "args") <> semi
+
+nullary name = text (var2id name ++ "_") <> parens empty
+                
