@@ -1,0 +1,56 @@
+// GeNeRaTeD fOr: ./Values/Primitive/Integers/Integers.cbs
+package funcons.algebras;
+
+public interface IntegersAlg<E> {
+  E bounded_integers__(E[] args);
+  E bounded_ints__(E[] args);
+  E positive_integers_();
+  E pos_ints_();
+  E negative_integers_();
+  E neg_ints_();
+  E natural_numbers_();
+  E nats_();
+  E natural_successor__(E[] args);
+  E nat_succ__(E[] args);
+  E natural_predecessor__(E[] args);
+  E nat_pred__(E[] args);
+  E integer_add__(E[] args);
+  E int_add__(E[] args);
+  E integer_subtract__(E[] args);
+  E int_sub__(E[] args);
+  E integer_multiply__(E[] args);
+  E int_mul__(E[] args);
+  E integer_divide__(E[] args);
+  E int_div__(E[] args);
+  E integer_modulo__(E[] args);
+  E int_mod__(E[] args);
+  E integer_power__(E[] args);
+  E int_pow__(E[] args);
+  E integer_absolute_value__(E[] args);
+  E int_abs__(E[] args);
+  E integer_negate__(E[] args);
+  E int_neg__(E[] args);
+  E integer_is_less__(E[] args);
+  E is_less__(E[] args);
+  E integer_is_less_or_equal__(E[] args);
+  E is_less_or_equal__(E[] args);
+  E integer_is_greater__(E[] args);
+  E is_greater__(E[] args);
+  E integer_is_greater_or_equal__(E[] args);
+  E is_greater_or_equal__(E[] args);
+  E binary_natural__(E[] args);
+  E binary__(E[] args);
+  E octal_natural__(E[] args);
+  E octal__(E[] args);
+  E decimal_natural__(E[] args);
+  E decimal__(E[] args);
+  E hexadecimal_natural__(E[] args);
+  E hexadecimal__(E[] args);
+  E integer_sequence__(E[] args);
+  E integers_();
+  E ints_();
+  E integers_from__(E[] args);
+  E from__(E[] args);
+  E integers_up_to__(E[] args);
+  E up_to__(E[] args);
+}
