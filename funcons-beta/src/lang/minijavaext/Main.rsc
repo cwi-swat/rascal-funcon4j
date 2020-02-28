@@ -1,7 +1,7 @@
-module lang::minijava::Main
+module lang::minijavaext::Main
 
-import lang::minijava::Syntax;
-import lang::minijava::Translation;
+import lang::minijavaext::Syntax;
+import lang::minijavaext::Translation;
 
 import lang::funcon::ToFCT;
 
@@ -10,7 +10,7 @@ import String;
 import IO;
 
 public void main(){
-  for (loc l <- |project://rascal-funconb4j/examples/minijava|.ls, endsWith(l.file,".minijava")) 
+  for (loc l <- |project://rascal-funconb4j/examples/minijava-ext|.ls, endsWith(l.file,".minijava")) 
     generateFCT_file(l);
 }
 

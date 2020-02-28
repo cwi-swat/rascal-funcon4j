@@ -41,6 +41,11 @@ public interface PrintableClassesFactory extends ClassesAlg<IPrint> {
   }
   
   @Override
+  default IPrint merge_classes__(IPrint[] args) {
+    return FCTPrinter.variadic("merge-classes",args);
+  }
+  
+  @Override
   default IPrint classes_() {
     return FCTPrinter.nullary("classes");
   }

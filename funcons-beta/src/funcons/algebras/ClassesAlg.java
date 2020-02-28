@@ -9,5 +9,6 @@ public interface ClassesAlg<E> {
   E class_name_tree__(E[] args);
   E is_subclass_name__(E[] args);
   E class_name_single_inheritance_feature_map__(E[] args);
+  E merge_classes__(E[] args);
   E classes_();
 }

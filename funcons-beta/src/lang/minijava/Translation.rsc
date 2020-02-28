@@ -16,8 +16,9 @@ FunCon run((Program)
  	'    <Statement S> 
  	'  }
  	'} <ClassDecl* CDs>`) 
- 	= scope_(recursive_(bound_names(CDs), declare_classes(CDs)), execute(S));
+ 	= scope_(class_sequence(CDs), execute(S));
 	
+FunCon class_sequence(CDs) = recursive_(bound_names(CDs), declare_classes(CDs));
 
 FunCon bound_names(ClassDecl* decls) = set_([bound_name(cd) | cd <- decls]);
 FunCon bound_name((ClassDecl) 
