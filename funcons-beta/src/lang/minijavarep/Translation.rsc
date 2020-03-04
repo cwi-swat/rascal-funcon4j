@@ -27,11 +27,7 @@ FunCon phrase_decl((Phrase)
 FunCon class_sequence_(CDs) = accumulate_(bind_class_occurrences(class_occurrences(CDs))
                                          ,recursive_(bound_names(CDs), declare_classes_(CDs)));
     
-FunCon bind_class_occurrences(list[FunCon] ids) = map_([ tuple_ (id, fresh_init_link_(values_(),empty_class(id))) | id <- ids]);
-    
-FunCon empty_class(id) = class_ (thunk_ (abstraction_(
-                             sequential_(print_(literal("\"class \""), to_string_(id), literal("\" not declared\""))
-                                        ,fail_()))), map_());
+FunCon bind_class_occurrences(list[FunCon] ids) = map_([ tuple_ (id, fresh_link_(values_())) | id <- ids]);
     
 list[FunCon] class_occurrences(d) {
     res = [];
