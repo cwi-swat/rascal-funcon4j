@@ -29,5 +29,5 @@ A oa;..
 
 oa = new A();..
 
-oa.mc() ..
-oa.mc() ..
+oa.mc() .. // prints 9
+oa.mc() .. // prints 13

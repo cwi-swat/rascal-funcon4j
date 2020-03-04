@@ -12,7 +12,7 @@ A oa; ..
 
 oa = new A(); ..
 
-oa.ma()..
+oa.ma().. // prints 1
 
 class A {
   int b;
@@ -25,4 +25,4 @@ class A {
 
 
 oa = new A(); ..
-oa.ma()..
+oa.ma().. // prints 2

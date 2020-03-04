@@ -8,5 +8,5 @@ class A {
 
 A oa;..
 oa = new A();..
-oa.ma() ..
-oa.mb() ..
+oa.ma() .. // prints 0
+oa.mb() .. // prints 1

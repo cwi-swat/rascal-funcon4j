@@ -21,6 +21,6 @@ class A {
     return 7;
   }
 }..
-oa.ma() ..
-oa.mb() ..
-oa.mc() ..
+oa.ma() .. // prints 42
+oa.mb() .. // prints 7
+oa.mc() .. // prints 12

@@ -15,8 +15,8 @@ A oa; ..
 
 oa = new A();..
 
-oa.ma() ..
-oa.mc() ..
+oa.ma() .. // prints 1
+oa.mc() .. // prints 12
 
 class A {
   public int ma() {
@@ -29,6 +29,6 @@ class A {
 }..
 
 
-oa.ma()..
-oa.mb()..
-oa.mc()..
+oa.ma().. // prints 43
+oa.mb().. // prints 7
+oa.mc().. // prints 12

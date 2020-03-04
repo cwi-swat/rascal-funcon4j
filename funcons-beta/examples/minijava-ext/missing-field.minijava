@@ -26,4 +26,4 @@ A oa;..
 
 oa = new A();..
 
-oa.ma() ..
+oa.ma() .. // prints 0

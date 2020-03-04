@@ -18,7 +18,7 @@ class I {
   }
 }..
 
-i.call();..
+i.call();.. // prints 0
 
 class I {
   public int api() {
@@ -26,4 +26,4 @@ class I {
   }
 }..
 
-i.call();..
+i.call();.. // prints 1

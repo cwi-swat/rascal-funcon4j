@@ -14,7 +14,7 @@ class D {
   }
 }..
 
-i.call()..
+i.call().. // print 1
 
 class D {
   public int api() {
@@ -22,4 +22,4 @@ class D {
   }
 }..
 
-i.call()..
+i.call().. // print 2
