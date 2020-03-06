@@ -15,7 +15,7 @@ data Val = ref(Ref r)
          | closure(Closure closure)
          | classlit(Class class)
          | objectlit(Object obj)
-         | nothing();
+         | null_value();
           
 alias Ref     = int;
 alias Closure = Context(Context);
@@ -25,7 +25,7 @@ data Object   = object(int id, str class_name, Env fields, list[Object] parents)
 Context empty_context() {
   Env env = ();
   Sto sto = ();
-  return ctx(env, sto, 0, [], nothing(), false, nothing());
+  return ctx(env, sto, 0, [], null_value(), false, null_value());
 } 
 
 Context in_environment(Context c, Env env, Context(Context) body) {
@@ -47,7 +47,7 @@ Val get_given(Context c) {
   return c.given;
 }
 
-Context set_fail(Context c) = ctx(c.env, c.sto, c.seed, c.out, c.given, true, nothing());
+Context set_fail(Context c) = ctx(c.env, c.sto, c.seed, c.out, c.given, true, null_value());
 
 Val get_result(Context c) = c.res;
 Context set_result(Context c, Val res) = ctx(c.env, c.sto, c.seed, c.out, c.given, c.failed, res);
