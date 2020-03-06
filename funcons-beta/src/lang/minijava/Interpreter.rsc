@@ -82,7 +82,6 @@ set[str] class_occurrences(d) {
     return res;
   }
 
-Context declare_classes(Context c, (ClassDecls) `<ClassDecl* CDs>`) = declare_classes(c, CDs);
 Context declare_classes(Context c, ClassDecl CD) = declare_class(c, CD);
 Context declare_classes(Context c, ClassDecl* CDs) = declare_classes(c, [ CD | CD <- CDs]);
 Context declare_classes(Context c, []) = set_result(c, envlit(()));
