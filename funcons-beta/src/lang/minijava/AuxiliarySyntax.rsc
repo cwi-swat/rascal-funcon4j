@@ -13,8 +13,8 @@ data Val = ref(Ref r)
          | envlit(Env e)
          | listlit(list[value] l)
          | closure(Closure closure)
-         | class(Class class)
-         | object(Object obj)
+         | classlit(Class class)
+         | objectlit(Object obj)
          | nothing();
           
 alias Ref     = int;

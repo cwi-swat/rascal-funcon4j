@@ -10,12 +10,23 @@ import String;
 import List;
 import IO;
 
-Context exec(Program p) = exec(p, empty_context());
-Context exec(Program p, Context c) {
-  return main(c, p);
+void main() {
+  program = load(|project://rascal-funconb4j/examples/minijava/LinkedList.minijava|);
+  c = exec(program);
+  if (!c.failed) {
+    for (str s <- c.out) {
+      print(s);
+    }
+  }
+  else print(c);
 }
 
-Context main(Context c, (Program)
+Context exec(Program p) = exec(p, empty_context());
+Context exec(Program p, Context c) {
+  return do_main(c, p);
+}
+
+Context do_main(Context c, (Program)
     `class <Identifier ID1> { 
  	'  public static void main ( String[] <Identifier ID2> ) { 
  	'    <Statement S> 
@@ -51,29 +62,30 @@ Context bind_class_occurrences(Context c, class_names) {
   return set_result(c, envlit(res));
 }
 
-list[str] class_occurrences(d) {
-    res = [];
+set[str] class_occurrences(d) {
+    set[str] res = {};
     top-down visit(d) {
        case (Expression) `new <Identifier ID> ()` : {
-         res = res + ["<ID>"];
+         res = res + {"<ID>"};
        }
        case (ClassDecl) `class <Identifier ID1>  {
                         '    <VarDecl* VDs> <MethodDecl* MDs>  
                         '}` : {
-         res = res + ["<ID1>"];               
+         res = res + {"<ID1>"};               
        }     
        case (ClassDecl) `class <Identifier ID1> extends <Identifier ID2> {
                         '    <VarDecl* VDs> <MethodDecl* MDs>  
                         '}` : {
-         res = res + ["<ID1>"];               
+         res = res + {"<ID1>"};               
        }
     };
     return res;
   }
 
+Context declare_classes(Context c, (ClassDecls) `<ClassDecl* CDs>`) = declare_classes(c, CDs);
 Context declare_classes(Context c, ClassDecl CD) = declare_class(c, CD);
 Context declare_classes(Context c, ClassDecl* CDs) = declare_classes(c, [ CD | CD <- CDs]);
-Context declare_classes(Context c, []) = c;
+Context declare_classes(Context c, []) = set_result(c, envlit(()));
 Context declare_classes(Context c, [CD, *CDs]) {
   c = declare_class(c, CD);
   if (!c.failed && envlit(env1) := get_result(c)) {
@@ -100,13 +112,14 @@ Context declare_class(Context c, ID, VDs, MDs, Maybe[str] mID2) {
     <obj_id, local_c> = fresh_atom(local_c);
     local_c = declare_variables(local_c,VDs);
     if (!c.failed && envlit(field_map) := get_result(local_c)) {
+      list[Object] parents = [];
       if (just(ID2) := mID2) {
         try {
           if (ref(r) := local_c.env["<ID2>"]) {
-            if (class(pc) := local_c.sto[r]) {
+            if (classlit(pc) := local_c.sto[r]) {
               local_c = pc.cons(local_c);
-              if(!local_c.failed && object(po) := get_result(local_c))
-                list[Object] parents = [po];
+              if(!local_c.failed && objectlit(po) := get_result(local_c))
+                parents = [po];
               else
                 return set_fail(c);
             }
@@ -114,27 +127,24 @@ Context declare_class(Context c, ID, VDs, MDs, Maybe[str] mID2) {
           }
           else return set_fail(c);
         }
-        catch: return set_fail(c);
+        catch exc: {print(exc); return set_fail(c);}
       }
-      else {
-        list[Object] parents = [];
-      }
-      return set_result(local_c, object(obj_id, "<ID>", field_map, parents));
+      return set_result(local_c, objectlit(object(obj_id, "<ID>", field_map, parents)));
     }
+    else return set_fail(c);
   };
   c = declare_methods(c,MDs);
   if (!c.failed && envlit(method_map) := get_result(c)) {
+	  class_val = class(cons,method_map,[]);
 	  if (just(ID2) := mID2)
 	    class_val = class(cons,method_map,["<ID2>"]);
-	  else
-	    class_val = class(cons,method_map,[]);
 	  try {
 	    if(ref(r) := c.env["<ID>"]) {
-	  	  return sto_override(c, ( r : class(class_val) ));
+	  	  return set_result(sto_override(c, ( r : classlit(class_val) )), envlit(( "<ID>" : ref(r))));
 	    }
 	    else return set_fail(c);
 	  }
-	  catch exc: return set_fail(c);
+	  catch exc: {print(exc); return set_fail(c);}
   }
   else return set_fail(c);
 }
@@ -160,16 +170,21 @@ Context declare_method(Context c0, (MethodDecl)
 	'}`) {
 	clos = closure(Context(Context local_c) {
 	  return in_environment(local_c, c0.env, Context(Context local_c) {
-	    if (listlit([ref(r), *ARGS]) := get_given(local_c)) {
+	    if (listlit([objectlit(obj), *ARGS]) := get_given(local_c)) {
+	      <r, local_c> = fresh_atom(local_c);
+	      local_c = sto_override(local_c, (r : objectlit(obj)));
 	      local_c = match_formals(local_c, formal_list(FLs), ARGS);
           if(!local_c.failed && envlit(args_map) := get_result(local_c)) {
-	        //fields_map = retrieve_fields(local_c, r);
-	        local_c = declare_variables(local_c, [VD | VD <- VDs]);	
-	        if (!local_c.failed && envlit(local_map) := get_result(local_c)) {
-	          return in_environment(local_c, ("this" : ref(r)) + args_map /* + fields_map*/ + local_map, Context(Context local_c) {
-	            return eval(exec(local_c, [ s | s <- Ss] ), E);
-	          });
-	        }
+	        local_c = retrieve_fields(local_c, obj);
+	        if(!local_c.failed && envlit(fields_map) := get_result(local_c)) { 
+		        local_c = declare_variables(local_c, [VD | VD <- VDs]);	
+		        if (!local_c.failed && envlit(local_map) := get_result(local_c)) {
+		          return in_environment(local_c, ("this" : ref(r)) + args_map + fields_map + local_map, Context(Context local_c) {
+		            return eval(exec(local_c, [ s | s <- Ss] ), E);
+		          });
+		        }
+		        else return set_fail(local_c);
+		    }
 	        else return set_fail(local_c);
           } 
           else return set_fail(local_c);
@@ -199,11 +214,16 @@ list[str] formal_list(FormalList? FLs) = [ x | FL <- FLs, x <- formal_list(FL)];
 list[str] formal_list((FormalList) `<Type T> <Identifier ID>`) = ["<ID>"];
 list[str] formal_list((FormalList)`<Type T> <Identifier ID> , <FormalList FLs>`) = ["<ID>"] + formal_list(FLs);
 
-Env retrieve_fields(Context c, r) {
-  if (object(obj) := c.sto[r]) {
-    p_env = ( () | it + env | par <- obj.parents, env <- retrieve_fields(c, par));
-    return p_env + obj.fields;
+Context retrieve_fields(Context c, obj) {
+  p_env = obj.fields;
+  for (par <- obj.parents) {
+    c = retrieve_fields(c, par);
+    if (!c.failed && envlit(env) := get_result(c)) {
+      p_env = p_env + env;
+    }
+    else return set_fail(c);
   }
+  return set_result(c, envlit(p_env));
 }
 
 Context declare_variables(Context c, VarDecl* VDs) = declare_variables(c, [ VD | VD <- VDs]);
@@ -224,6 +244,7 @@ Val initial_value((Type) `int`) = intlit(0);
 Val initial_value((Type) `<Identifier ID>`) = nothing();
 
 // statements
+// TODO array assignment	
 Context exec(Context c, (Statement) `{ <Statement* Stmts> }`) = exec(c, [ s | s <- Stmts ]);
 Context exec(Context c, list[Statement] ss) = set_result(( c | exec(it, s) | s <- ss ), nothing());
 Context exec(Context c, (Statement) `<Identifier ID> = <Expression E>;`) {
@@ -234,11 +255,33 @@ Context exec(Context c, (Statement) `<Identifier ID> = <Expression E>;`) {
     }
     else return set_fail(c);
   }
-  catch: return set_fail(c); 
+  catch exc: {print(exc); return set_fail(c);} 
+}
+Context exec(Context c, (Statement) `<Identifier ID> [ <Expression E1> ] = <Expression E2>;`) {
+  c = eval(c, E1);
+  if (!c.failed && intlit(N) := get_result(E1)) {
+    try {
+      if (ref(r) := c.env["<ID>"]) {
+        if (vec(V) := c.sto[r]) {
+          if (ref(R2) := V[N]) {
+            c = eval(c, E2);
+            if (!c.failed) {
+              return set_result(sto_override(c, ( R2 : get_result(c))), nothing());
+            } else return set_fail(c);
+          }else return set_fail(c);
+        }
+        else return set_fail(c);
+      }else return set_fail(c);
+    }
+    catch exc: { print exc; return set_fail(c);}  
+  }
+  else return set_fail(c);
 }
 Context exec(Context c, (Statement) `System.out.println(<Expression E>);`) {
   c = eval(c, E);
-  return set_result(append_output(c, [to_string(get_result(c)), "\n"]), nothing());
+  if (!c.failed)
+    return set_result(append_output(c, [to_string(get_result(c)), "\n"]), nothing());
+  return c;
 }
 Context exec(Context c, (Statement) `while( <Expression E> ) <Statement S>`) {
   b = true;
@@ -266,11 +309,15 @@ Context exec(Context c, (Statement) `if ( <Expression E> ) <Statement S1> else <
 Context eval(Context c0, (Expression) `<Identifier ID>`) {
   try    if (ref(r) := c0.env["<ID>"]) return set_result(c0, c0.sto[r]); 
          else return set_fail(c0);
-  catch: return set_fail(c0);
+  catch exc: {print(exc); return set_fail(c0);}
 }
-Context eval(Context c0, (Expression) `this`) {
-  try    return set_result(c0, c0.sto[c0.env["this"]]);
-  catch: return set_fail(c0);
+Context eval(Context c, (Expression) `this`) {
+  try    {
+    if (ref(r) := c.env["this"]) {
+      return set_result(c, c.sto[r]);
+    }else return set_fail(c);
+  }
+  catch exc: {print(exc); return set_fail(c);}
 }
 Context eval(Context c, (Expression) `(<Expression E>)`) = eval(c, E);
 Context eval(Context c, (Expression) `<Integer I>`) = set_result(c, intlit(toInt("<I>")));
@@ -323,17 +370,16 @@ Context eval(Context c, (Expression) `<Expression E1> * <Expression E2>`) {
   c = eval(c, E1); 
   if(!c.failed && intlit(x) := get_result(c)) {
 	  c = eval(c, E2);
-	  if (!c.failed && intlit(y) := get_result(c2))
-	    return set_result(c2, intlit(x * y));
+	  if (!c.failed && intlit(y) := get_result(c))
+	    return set_result(c, intlit(x * y));
 	  else
-	    return set_fail(c2);  
+	    return set_fail(c);  
   }
-  else return set_fail(c2);
+  else return set_fail(c);
 }
-Context eval(Context c0, (Expression) `new int [ <Expression E1> ]`) {
-  c1 = eval(c0, E1); 
-  if (!c.failed && intlit(x) := get_result(c1)) {
-    c = c1;
+Context eval(Context c, (Expression) `new int [ <Expression E1> ]`) {
+  c = eval(c, E1); 
+  if (!c.failed && intlit(x) := get_result(c)) {
     res = [];
     for(int _ <- [0..x]) {
       <r, c> = fresh_atom(c);
@@ -343,14 +389,46 @@ Context eval(Context c0, (Expression) `new int [ <Expression E1> ]`) {
     return set_result(c, vec(res));
   }
   else
-    return set_fail(c1);
+    return set_fail(c);
+}
+Context eval(Context c, (Expression) `new <Identifier ID>()`) {
+  try{
+	  if (ref(r) := c.env["<ID>"]) {
+	    if(classlit(cl) := c.sto[r]) {
+	       return cl.cons(c);
+	    }
+	    else return set_fail(c);
+	  }
+	  else return set_fail(c);
+  } catch exc: {print(exc); return set_fail(c);}
+}
+Context eval(Context c, (Expression) `<Expression E>.<Identifier ID> ( <ExpressionList? ELs> )`) {
+  c = eval(c, E);
+  if (!c.failed && objectlit(obj) := get_result(c)) {
+    try {
+      c = compute_class_members(c, obj.class_name);
+      if(!c.failed && envlit(member_map) := get_result(c)) {
+        if(closure(clos) := member_map["<ID>"]) {
+           c = evaluate_actuals(c, actuals(ELs));
+           if(!c.failed && listlit(ARGS) := get_result(c)) {
+             return with_given(c, listlit([objectlit(obj)] + ARGS), clos);
+           }
+           else return set_fail(c);
+        }
+        else return set_fail(c);
+      }
+      else return set_fail(c);
+    }
+    catch : return set_fail(c);
+  }
+  else return set_fail(c);
 }
 Context eval(Context c0, (Expression) `<Expression E1> [ <Expression E2> ]`) {
   c1 = eval(c0, E2); 
   c2 = eval(c1, E1);
   if (<intlit(x), vec(y)> := <get_result(c1), get_result(c2)>) {
     try    return set_result(c2, c2.sto[y[x]]);
-    catch: return set_fail(c2);
+    catch exc: {print(exc); return set_fail(c2);}
   }
   else
     return set_fail(c2);
@@ -364,8 +442,47 @@ Context eval(Context c0, (Expression) `<Expression E1> . length`) {
     return set_fail(c1);
 }
 
+Context compute_class_members(Context c, str class_name) {
+  try {
+    if (ref(r) := c.env[class_name] && classlit(cl) := c.sto[r]) {
+      sub_map = cl.members;
+      if ([parent_name] := cl.parents) {
+         c = compute_class_members(c, parent_name);
+         if (!c.failed && envlit(sup_map) := get_result(c)) {
+           return set_result(c, envlit(sub_map + sup_map));
+         }
+         else return set_fail(c);
+      }
+      else return set_result(c, envlit(sub_map));
+    }
+    else return set_fail(c);
+  }
+  catch exc: {print(exc); return set_fail(c);}
+}
+
+list[Expression] actuals(ExpressionList? ELs) = actuals([ E | E <- ELs ]);
+list[Expression] actuals([]) = [];
+list[Expression] actuals([(ExpressionList) `<Expression E>`]) = [ E ]; 
+list[Expression] actuals([(ExpressionList) `<Expression E>, <ExpressionList EL>`]) = [E] + actuals([EL]); 
+
+Context evaluate_actuals(Context c, []) = set_result(c, listlit([]));
+Context evaluate_actuals(Context c, [Expression E, *Es]) {
+  c = eval(c, E);
+  if (!c.failed) {
+    Val val = get_result(c);
+    c = evaluate_actuals(c, Es);
+    if (!c.failed && listlit(ARGS) := get_result(c)) {
+      return set_result(c, listlit(val + ARGS));
+    }
+    else return set_fail(c);
+  }
+  else return set_fail(c);
+}
+
 str to_string(ref(n)) = "ref@<n>";
 str to_string(intlit(n)) = "<n>";
 str to_string(boollit(b)) = "<b>";
+str to_string(lang::minijava::AuxiliarySyntax::nothing()) = "null";
+str to_string(V) = print("<V>");
 
 data OptEnv = Some(Env e) | Empty();
