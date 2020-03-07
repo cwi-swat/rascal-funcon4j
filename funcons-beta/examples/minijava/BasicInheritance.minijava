@@ -1,4 +1,4 @@
-class TestInheritance {
+class BasicInheritance {
   public static void main(String[] args) {
     System.out.println(new Sub().sub());
   }
