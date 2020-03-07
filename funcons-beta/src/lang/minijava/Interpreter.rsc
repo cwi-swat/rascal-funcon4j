@@ -12,15 +12,19 @@ import IO;
 
 void main() {
   for (loc l <- |project://rascal-funconb4j/examples/minijava|.ls, endsWith(l.file,".minijava")) {
-      println();println(l);
+      l_output = l.parent + (l.file + ".output");
+      println(l);
 	  program = load(l);
 	  c = exec(program);
+	  res = "";
 	  if (!c.failed) {
+	    res = "";
 	    for (str s <- c.out) {
-	      print(s);
+	      res += s;
 	    }
 	  }
-	  else println(c);
+	  else res = "<c>";
+	  writeFile(l_output, res);
   }
 }
 
