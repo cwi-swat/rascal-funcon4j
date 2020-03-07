@@ -1,0 +1,19 @@
+class SimpleOverride {
+  public static void main(String[] args) {
+    System.out.println(new Sub().method());
+  }
+}
+
+class Sup {
+  public int method() {
+    System.out.println(1);
+    return 1;
+  }
+}
+
+class Sub {
+  public int method() {
+    System.out.println(42);
+    return 42;
+  }
+}
