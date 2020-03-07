@@ -27,13 +27,14 @@ FunCon phrase_decl((Phrase)
 FunCon class_sequence_(CDs) = accumulate_(bind_class_occurrences(class_occurrences(CDs))
                                          ,recursive_(bound_names(CDs), declare_classes_(CDs)));
     
-FunCon bind_class_occurrences(list[FunCon] ids) = map_([ tuple_ (id, fresh_link_(values_())) | id <- ids]);
+FunCon bind_class_occurrences(set[FunCon] ids) = 
+  map_([ tuple_ (id, else_(bound_directly_(id), fresh_link_(values_()))) | id <- ids]);
     
-list[FunCon] class_occurrences(d) {
-    res = [];
+set[FunCon] class_occurrences(d) {
+    set[FunCon] res = {};
     top-down visit(d) {
        case (Expression) `new <Identifier ID> ()` : {
-         res = res + [id("<ID>")];
+         res = res + {id("<ID>")};
        }
     };
     print(res);
@@ -53,7 +54,8 @@ FunCon declare_class_((ClassDecl)
 	`class <Identifier ID1> extends <Identifier ID2> { <VarDecl* VDs> <MethodDecl* MDs> }`) 
 	= maybe_merge_classes(ID1,
 	   class_ (thunk_ (closure_ (reference_ (object_ (
-				 fresh_atom_(), id("<ID1>"), declare_variables(VDs))))),
+				 fresh_atom_(), id("<ID1>"), declare_variables(VDs),
+		           dereference_(force_(class_instantiator_(bound_(id("<ID2>"))))))))),
 				 declare_methods(MDs),
 				 id("<ID2>")));
     

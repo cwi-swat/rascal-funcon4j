@@ -41,7 +41,8 @@ FunCon declare_class_((ClassDecl)
 	`class <Identifier ID1> extends <Identifier ID2> { <VarDecl* VDs> <MethodDecl* MDs> }`) 
 	= maybe_merge_classes(ID1,
 	   class_ (thunk_ (closure_ (reference_ (object_ (
-				 fresh_atom_(), id("<ID1>"), declare_variables(VDs))))),
+				 fresh_atom_(), id("<ID1>"), declare_variables(VDs),
+		           dereference_(force_(class_instantiator_(bound_(id("<ID2>"))))))))),
 				 declare_methods(MDs),
 				 id("<ID2>")));
 
