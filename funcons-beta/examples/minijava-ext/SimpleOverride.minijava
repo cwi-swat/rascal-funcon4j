@@ -1,18 +1,14 @@
-class SimpleOverride {
-  public static void main(String[] args) {
-    System.out.println(new Sub().method());
-  }
-}
-
 class Sup {
   int x;
   public int method() {
     return 1;
   }
 }
-
+..
 class Sub extends Sup {
   public int method() {
     return 42 + x;
   }
 }
+..
+new Sub().method();..
