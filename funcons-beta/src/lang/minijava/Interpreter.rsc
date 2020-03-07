@@ -272,18 +272,13 @@ Context exec(Context c, (Statement) `<Identifier ID> = <Expression E>;`) {
 }
 Context exec(Context c, (Statement) `<Identifier ID> [ <Expression E1> ] = <Expression E2>;`) {
   c = eval(c, E1);
-  if (!c.failed && intlit(N) := get_result(E1)) {
+  if (!c.failed && intlit(n) := get_result(c)) {
     try {
-      if (ref(r) := c.env["<ID>"]) {
-        if (vec(V) := c.sto[r]) {
-          if (ref(R2) := V[N]) {
-            c = eval(c, E2);
-            if (!c.failed) {
-              return set_result(sto_override(c, ( R2 : get_result(c))), null_value());
-            } else return set_fail(c);
-          }else return set_fail(c);
-        }
-        else return set_fail(c);
+      if (ref(r) := c.env["<ID>"] && vec(V) := c.sto[r]) {
+        c = eval(c, E2);
+        if (!c.failed) {
+          return set_result(sto_override(c, ( V[n] : get_result(c))), null_value());
+        } else return set_fail(c);
       }else return set_fail(c);
     }
     catch exc: { print exc; return set_fail(c);}  
@@ -442,7 +437,7 @@ Context eval(Context c, (Expression) `<Expression E>.<Identifier ID> ( <Expressi
       }
       else return set_fail(c);
     }
-    catch : return set_fail(c);
+    catch exc: {print(exc); return set_fail(c);}
   }
   else return set_fail(c);
 }

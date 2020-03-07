@@ -47,7 +47,9 @@ Val get_given(Context c) {
   return c.given;
 }
 
-Context set_fail(Context c) = ctx(c.env, c.sto, c.seed, c.out, c.given, true, null_value());
+Context set_fail(Context c) {
+  return ctx(c.env, c.sto, c.seed, c.out, c.given, true, null_value());
+}
 
 Val get_result(Context c) = c.res;
 Context set_result(Context c, Val res) = ctx(c.env, c.sto, c.seed, c.out, c.given, c.failed, res);
