@@ -1,7 +1,5 @@
 package lang.funcon;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;
